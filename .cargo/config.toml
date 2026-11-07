@@ -1,5 +1,6 @@
 [target.wasm32-unknown-unknown]
-rustflags = ['--cfg', 'getrandom_backend="wasm_js"', "-C", "linker=path/to/wild", "-C", "linker-flavor=wasm-ld"]
+# rustflags = ['--cfg', 'getrandom_backend="wasm_js"', "-C", "linker=/home/a365f/.cargo/bin/wild", "-C", "linker-flavor=wasm-ld"]
+rustflags = ['--cfg', 'getrandom_backend="wasm_js"']
 
 [target.x86_64-unknown-linux-gnu]
 linker = "clang"

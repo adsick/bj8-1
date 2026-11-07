@@ -1,5 +1,6 @@
 #![allow(clippy::type_complexity)]
 
+mod ui;
 mod old_gameplay;
 mod loading;
 mod menu;
@@ -39,7 +40,7 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<GameState>()
-            .add_plugins((LoadingPlugin, MenuPlugin, OldGameplayPlugin));
+            .add_plugins((ui::GameUiPlugin));
 
         #[cfg(debug_assertions)]
         {

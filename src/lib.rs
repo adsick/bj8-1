@@ -1,13 +1,11 @@
 #![allow(clippy::type_complexity)]
 
+
 mod ui;
 mod old_gameplay;
 mod loading;
 mod menu;
 
-use crate::old_gameplay::OldGameplayPlugin;
-use crate::loading::LoadingPlugin;
-use crate::menu::MenuPlugin;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -50,4 +48,12 @@ impl Plugin for GamePlugin {
             ));
         }
     }
+}
+
+#[derive(Resource)]
+pub struct Ingredients(Vec<Ingredient>);
+
+
+pub struct Ingredient {
+    name: String
 }

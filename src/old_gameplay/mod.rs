@@ -13,9 +13,9 @@ use finish_areas::FinishAreaPlugin;
 use game_object::GameObjectPlugin;
 use player::PlayerPlugin;
 
-pub struct GameplayPlugin;
+pub struct OldGameplayPlugin;
 
-impl Plugin for GameplayPlugin {
+impl Plugin for OldGameplayPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
             ActionsPlugin,

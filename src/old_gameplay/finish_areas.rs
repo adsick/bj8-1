@@ -1,6 +1,6 @@
-use crate::gameplay::collision::CircleCollider;
-use crate::gameplay::game_object::GameObject;
-use crate::gameplay::player::Player;
+use super::collision::CircleCollider;
+use super::game_object::GameObject;
+use super::player::Player;
 use crate::{GameResult, GameState};
 use bevy::prelude::*;
 

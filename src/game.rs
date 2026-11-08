@@ -2,7 +2,7 @@ mod input;
 mod logic;
 mod ui;
 
-use bevy::{prelude::*};
+use bevy::prelude::*;
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
 enum Mode {
@@ -11,7 +11,6 @@ enum Mode {
 }
 
 struct Word(String);
-
 
 #[derive(Resource, Default)]
 pub struct Ingredients(Vec<Ingredient>);
@@ -22,7 +21,7 @@ pub struct Ingredient {
 
 #[derive(Resource, Default)]
 pub struct Cauldron {
-    content: Vec<Ingredient>
+    content: Vec<Ingredient>,
 }
 
 pub struct GamePlugin;
@@ -36,11 +35,17 @@ impl Plugin for GamePlugin {
         app.init_resource::<Cauldron>();
         app.init_state::<Mode>();
 
-        app.insert_resource(Ingredients(vec![Ingredient {name: "test ingredient".into()}]));
+        app.insert_resource(Ingredients(vec![
+            Ingredient {
+                name: "test ingredient".into(),
+            },
+            Ingredient {
+                name: "another ingredient".into(),
+            },
+        ]));
     }
 }
 
 fn setup(mut cmds: Commands) {
     cmds.spawn(Camera2d);
 }
-

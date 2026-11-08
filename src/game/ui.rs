@@ -9,7 +9,7 @@ pub struct GameUiPlugin;
 impl Plugin for GameUiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup);
-        app.add_systems(Update, (update_ingredients_panel, update_cauldron_panel));
+        app.add_systems(Update, (update_ingredients_list, update_cauldron_list));
         app.insert_resource(GlobalUiDebugOptions { enabled: true, ..default()});
     }
 }
@@ -56,6 +56,7 @@ fn ingredients_panel() -> impl Scene {
             TextLayout{ justify: Justify::Center } 
             BorderColor{ bottom: Color::BLACK}
             --
+            #IngredientsList
             Node {
                 flex_direction: FlexDirection::Column,
             }
@@ -66,7 +67,7 @@ fn ingredients_panel() -> impl Scene {
 
 fn cauldron() -> impl Scene {
     bsn! {
-        #Cauldron
+        #CauldronPanel
         Node {
             justify_content: JustifyContent::Start,
             align_content: AlignContent::Center,
@@ -78,6 +79,9 @@ fn cauldron() -> impl Scene {
         }
         Children [
             Text("cauldron")
+            --
+            #CauldronList
+            Node
         ]
     }
 }
@@ -110,16 +114,23 @@ fn ingredient_word(n: usize, i: &Ingredient) -> impl Scene {
     word(format!("{}. {}", n, i.name))
 }
 
-fn update_ingredients_panel(mut cmds: Commands, i9s: Res<Ingredients>, panel_query: Query<(Entity, &Name)>) {
-    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("IngredientsPanel")) else { return };
+fn update_ingredients_list(mut cmds: Commands, i9s: Res<Ingredients>, panel_query: Query<(Entity, &Name)>) {
+    if !i9s.is_changed() {
+        return
+    }
+    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("IngredientsList")) else { return };
     let mut entity = cmds.entity(e);
     entity.despawn_children();
     entity.queue_spawn_related_scenes::<Children>(ingredients_list(&i9s.0));
 }
 
-fn update_cauldron_panel(mut cmds: Commands, cauldron: Res<Cauldron>, panel_query: Query<(Entity, &Name)>) {
-    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("CauldronPanel")) else { return };
+fn update_cauldron_list(mut cmds: Commands, cauldron: Res<Cauldron>, panel_query: Query<(Entity, &Name)>) {
+    if !cauldron.is_changed() {
+        return
+    }
+    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("CauldronList")) else { return };
     let mut entity = cmds.entity(e);
+    
     entity.despawn_children();
     entity.queue_spawn_related_scenes::<Children>(cauldron_list(&cauldron.content));
 }

@@ -127,9 +127,9 @@ fn ingredient_word(n: usize, i: &Ingredient) -> impl Scene {
     }
 }
 
-fn update_ingredients_list(action: On<UserAction>, mut cmds: Commands, i9s: Res<Ingredients>, panel_query: Query<(Entity, &Name, &Children)>) {
+fn update_ingredients_list(action: On<UserAction>, mut cmds: Commands, i9s: Res<Ingredients>, list_query: Query<(Entity, &Name, &Children)>) {
     let UserAction::PickIngredient(picked_ingredient) = action.event() else { return };
-    let Some((_e, _n, c)) = panel_query.iter().find(|(_e, n, c)| n == &&Name::new("IngredientsList")) else { return };
+    let Some((_e, _n, c)) = list_query.iter().find(|(_e, n, c)| n == &&Name::new("IngredientsList")) else { return };
 
     let i = &i9s.0[*picked_ingredient];
     // I assume that children are ordered
@@ -141,11 +141,11 @@ fn update_ingredients_list(action: On<UserAction>, mut cmds: Commands, i9s: Res<
     
 }
 
-fn update_cauldron_list(mut cmds: Commands, cauldron: Res<Cauldron>, panel_query: Query<(Entity, &Name)>) {
+fn update_cauldron_list(mut cmds: Commands, cauldron: Res<Cauldron>, list_query: Query<(Entity, &Name)>) {
     if !cauldron.is_changed() {
         return
     }
-    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("CauldronList")) else { return };
+    let Some((e, _n)) = list_query.iter().find(|(_e, n)| n == &&Name::new("CauldronList")) else { return };
     let mut entity = cmds.entity(e);
     
     entity.despawn_children();

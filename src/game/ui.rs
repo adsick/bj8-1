@@ -1,3 +1,4 @@
+use std::fmt::Write;
 use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::color::palettes::tailwind::BLUE_400;
 use bevy::prelude::*;
@@ -100,8 +101,16 @@ fn ingredients_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
     i9s.iter().enumerate().map(|(n, i)| Box::new(ingredient_word(n + 1, i)) as _).collect()
 }
 
-fn cauldron_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
-    i9s.iter().map(|i| Box::new(word(format!("{}", &i.name))) as _).collect()
+fn cauldron_list(i9s: &[Ingredient]) -> impl Scene {
+    if i9s.is_empty() {
+        return word("...".into());
+    }
+
+    let mut s = i9s.join(" + ");
+
+    
+    write!(&mut s, "= ...");
+    word(s)
 }
 
 fn word(text: impl Into<String>) -> impl Scene {
@@ -147,8 +156,8 @@ fn update_cauldron_list(mut cmds: Commands, cauldron: Res<Cauldron>, list_query:
     }
     let Some((e, _n)) = list_query.iter().find(|(_e, n)| n == &&Name::new("CauldronList")) else { return };
     let mut entity = cmds.entity(e);
+
+    entity.apply_scene(cauldron_list(&cauldron.content));
     
-    entity.despawn_children();
-    entity.queue_spawn_related_scenes::<Children>(cauldron_list(&cauldron.content));
 }
 

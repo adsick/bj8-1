@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::game::Cauldron;
 use crate::game::Mode;
 use crate::game::UserAction;
 use crate::game::input::UserInput;
@@ -27,4 +28,8 @@ fn pick_ingredient(input: On<UserInput>, mut cmds: Commands, i9s: Res<Ingredient
 
 fn get_ingredient() -> Ingredient {
    Ingredient { name: "todo".into() }
+}
+
+fn put_to_cauldron(action: On<UserAction>, cauldron: ResMut<Cauldron>) {
+    // ?
 }

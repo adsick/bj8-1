@@ -2,6 +2,8 @@ mod input;
 mod logic;
 mod ui;
 
+use std::borrow::Borrow;
+
 use bevy::prelude::*;
 
 
@@ -24,6 +26,12 @@ pub struct Ingredients(Vec<Ingredient>);
 
 pub struct Ingredient {
     name: String,
+}
+
+impl Borrow<str> for Ingredient {
+    fn borrow(&self) -> &str {
+        &self.name
+    }
 }
 
 #[derive(Resource, Default)]

@@ -1,10 +1,15 @@
-use bevy::{input::keyboard::KeyboardInput, prelude::*};
+use bevy::{
+    input::{
+        ButtonState,
+        keyboard::{Key, KeyboardInput},
+    },
+    prelude::*,
+};
 
 pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
-        
         app.add_systems(Update, handle_keyboard_input);
     }
 }
@@ -22,15 +27,15 @@ impl From<u8> for UserInput {
 
 #[derive(Event)]
 enum UserAction {
-    PickIngredient(u8)
+    PickIngredient(u8),
 }
 
-fn handle_keyboard_input(mut cmds: Commands, mut keyboard: MessageReader<KeyboardInput>) {
-    for message in keyboard.read() {
-        let Some(ref t) = message.text else { continue };
-        debug!("Input: {t}");
+fn handle_keyboard_input(mut cmds: Commands, kbd: Res<ButtonInput<Key>>) {
+    for key in kbd.get_just_pressed() {
+        let Key::Character(c) = key else { continue };
+        debug!("Input: {c}");
 
-        let Ok(n) = t.parse::<u8>() else { continue };
+        let Ok(n) = c.parse::<u8>() else { continue };
 
         let input = UserInput::from(n);
         cmds.trigger(input);

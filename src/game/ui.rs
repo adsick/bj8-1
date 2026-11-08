@@ -1,9 +1,11 @@
-use std::fmt::Write;
-use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::color::palettes::tailwind::BLUE_400;
 use bevy::prelude::*;
+use std::fmt::Write;
 
 use crate::game::{Cauldron, Ingredient, Ingredients, UserAction};
+
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct UpdateUi;
 
 pub struct GameUiPlugin;
 
@@ -12,7 +14,10 @@ impl Plugin for GameUiPlugin {
         app.add_systems(Startup, setup);
         app.add_observer(update_ingredients_list);
         app.add_systems(Update, (update_cauldron_list));
-        app.insert_resource(GlobalUiDebugOptions { enabled: true, ..default()});
+        app.insert_resource(GlobalUiDebugOptions {
+            enabled: true,
+            ..default()
+        });
     }
 }
 
@@ -27,14 +32,16 @@ fn main_screen() -> impl Scene {
            width: percent(100),
            height: percent(100),
            flex_direction: FlexDirection::Row,
-           justify_content: JustifyContent::Center,
+           justify_content: JustifyContent::SpaceBetween,
            align_items: AlignItems::Center,
 
         }
         Children [
             @ingredients_panel()
             --
-            @cauldron()
+            @cauldron_panel()
+            --
+            @product_panel()
         ]
     }
 }
@@ -43,26 +50,26 @@ fn ingredients_panel() -> impl Scene {
     bsn! {
         #IngredientsPanel
         Node {
-            border: px(3),
-            width: rem(13),
+            border: px(4),
+            width: rem(16),
             height: percent(90),
             flex_direction: FlexDirection::Column,
         }
         BorderColor::from(BLUE_400)
-        BackgroundColor(Color::hsl(235.0, 0.4, 0.13))
+        BackgroundColor(Color::hsla(200.0, 0.4, 0.13, 1.0))
         Children [
             Node {
                 height: rem(2),
             }
             Text("ingredients")
-            TextLayout{ justify: Justify::Center } 
+            TextLayout{ justify: Justify::Center }
             BorderColor{ bottom: Color::BLACK}
             --
             #IngredientsList
             Node {
                 flex_direction: FlexDirection::Column,
             }
-            Children [{ 
+            Children [{
                 ingredients_list(
                     &[
                         Ingredient{name: "what".into()},
@@ -76,41 +83,72 @@ fn ingredients_panel() -> impl Scene {
     }
 }
 
-fn cauldron() -> impl Scene {
+fn cauldron_panel() -> impl Scene {
     bsn! {
         #CauldronPanel
         Node {
             justify_content: JustifyContent::Start,
-            align_content: AlignContent::Center,
-            // justify_items: JustifyItems::Start,
-            // align_items: AlignItems::Start,
             flex_direction: FlexDirection::Column,
-            width: px(300),
-            height: px(200)
+            width: px(400),
+            height: px(300),
+
+            border: px(7),
+            border_radius: BorderRadius::MAX,
         }
+        BackgroundColor(Color::hsla(150.0, 0.5, 0.3, 0.6))
+        BorderColor::from(Color::hsl(120.0, 0.4, 0.09))
         Children [
             Text("cauldron")
+            TextLayout{ justify: Justify::Center }
+            BorderColor{ bottom: Color::BLACK}
             --
             #CauldronList
-            Node
+
+        ]
+    }
+}
+
+fn product_panel() -> impl Scene {
+    bsn! {
+        #ProductPanel
+        Node {
+            width: rem(16),
+            height: rem(30)
+        }
+        Children [
+            Text("product orders")
+            TextLayout{ justify: Justify::Center }
+            BorderColor{ bottom: Color::BLACK}
+            --
+            #ProductsList
         ]
     }
 }
 
 fn ingredients_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
-    i9s.iter().enumerate().map(|(n, i)| Box::new(ingredient_word(n + 1, i)) as _).collect()
+    i9s.iter()
+        .enumerate()
+        .map(|(n, i)| Box::new(ingredient_word(n + 1, i)) as _)
+        .collect()
 }
 
 fn cauldron_list(i9s: &[Ingredient]) -> impl Scene {
+    let node = bsn! { Node {
+        height: percent(70),
+        align_items: AlignItems::Center, // todo: doesn't center
+        justify_content: JustifyContent::Center,
+    }};
     if i9s.is_empty() {
-        return word("...".into());
+        return bsn! {  @node Children[@centered_word("...".to_string())]};
     }
 
     let mut s = i9s.join(" + ");
 
-    
-    write!(&mut s, "= ...");
-    word(s)
+    let _ = write!(&mut s, "= ...");
+    bsn! {
+        @node
+        Children[ @centered_word(s) ]
+    }
 }
 
 fn word(text: impl Into<String>) -> impl Scene {
@@ -121,7 +159,6 @@ fn word(text: impl Into<String>) -> impl Scene {
                 top: em(0.6)
             },
         }
-        // BackgroundColor(RED)
         Text(text)
         TextShadow {
             offset: vec2(0.5, 0.5)
@@ -129,6 +166,14 @@ fn word(text: impl Into<String>) -> impl Scene {
     }
 }
 
+fn centered_word(text: impl Into<String>) -> impl Scene {
+    bsn! {
+        @word(text)
+        TextLayout {
+            justify: Justify::Center
+        }
+    }
+}
 
 fn ingredient_word(n: usize, i: &Ingredient) -> impl Scene {
     bsn! {
@@ -136,28 +181,49 @@ fn ingredient_word(n: usize, i: &Ingredient) -> impl Scene {
     }
 }
 
-fn update_ingredients_list(action: On<UserAction>, mut cmds: Commands, i9s: Res<Ingredients>, list_query: Query<(Entity, &Name, &Children)>) {
-    let UserAction::PickIngredient(picked_ingredient) = action.event() else { return };
-    let Some((_e, _n, c)) = list_query.iter().find(|(_e, n, c)| n == &&Name::new("IngredientsList")) else { return };
+fn update_ingredients_list(
+    action: On<UserAction>,
+    mut cmds: Commands,
+    i9s: Res<Ingredients>,
+    list_query: Query<(Entity, &Name, &Children)>,
+) {
+    let UserAction::PickIngredient(picked_ingredient) = action.event() else {
+        return;
+    };
+    let Some((_e, _n, c)) = list_query
+        .iter()
+        .find(|(_e, n, c)| n == &&Name::new("IngredientsList"))
+    else {
+        return;
+    };
 
     let i = &i9s.0[*picked_ingredient];
     // I assume that children are ordered
-    let Some(entity) = c.get(*picked_ingredient) else { debug!("tried to pick an ingredient which doesn't exist: {picked_ingredient}"); return; };
-
+    let Some(entity) = c.get(*picked_ingredient) else {
+        debug!("tried to pick an ingredient which doesn't exist: {picked_ingredient}");
+        return;
+    };
 
     // todo: insert new ingredient from the pool here instead
-    cmds.entity(*entity).apply_scene(ingredient_word(picked_ingredient + 1, i));
-    
+    cmds.entity(*entity)
+        .apply_scene(ingredient_word(picked_ingredient + 1, i));
 }
 
-fn update_cauldron_list(mut cmds: Commands, cauldron: Res<Cauldron>, list_query: Query<(Entity, &Name)>) {
+fn update_cauldron_list(
+    mut cmds: Commands,
+    cauldron: Res<Cauldron>,
+    list_query: Query<(Entity, &Name)>,
+) {
     if !cauldron.is_changed() {
-        return
+        return;
     }
-    let Some((e, _n)) = list_query.iter().find(|(_e, n)| n == &&Name::new("CauldronList")) else { return };
+    let Some((e, _n)) = list_query
+        .iter()
+        .find(|(_e, n)| n == &&Name::new("CauldronList"))
+    else {
+        return;
+    };
     let mut entity = cmds.entity(e);
 
     entity.apply_scene(cauldron_list(&cauldron.content));
-    
 }
-

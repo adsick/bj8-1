@@ -1,11 +1,10 @@
 #![allow(clippy::type_complexity)]
 
-
-mod ui;
-mod old_gameplay;
+mod game;
 mod loading;
 mod menu;
-
+mod old_gameplay;
+mod ui;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -38,22 +37,25 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<GameState>()
-            .add_plugins((ui::GameUiPlugin));
+            .add_plugins((ui::GameUiPlugin, game::GameplayPlugin));
 
         #[cfg(debug_assertions)]
         {
+            use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
+
             app.add_plugins((
                 FrameTimeDiagnosticsPlugin::default(),
+                EguiPlugin::default(),
+                WorldInspectorPlugin::new(),
                 LogDiagnosticsPlugin::default(),
             ));
         }
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct Ingredients(Vec<Ingredient>);
 
-
 pub struct Ingredient {
-    name: String
+    name: String,
 }

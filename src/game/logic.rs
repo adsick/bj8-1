@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use crate::game::Cauldron;
 use crate::game::Mode;
+use crate::game::UserAction;
 use crate::game::input::UserInput;
 use crate::game::Ingredient;
 use crate::game::Ingredients;
@@ -14,16 +14,15 @@ impl Plugin for LogicPlugin {
     }
 }
 
-fn pick_ingredient(input: On<UserInput>, i9s: ResMut<Ingredients>, mut cauldron: ResMut<Cauldron>) {
+fn pick_ingredient(input: On<UserInput>, mut cmds: Commands, i9s: Res<Ingredients>) {
     let i9s = i9s.into_inner();
-    let total = i9s.0.len();
+    let total_ingredients = i9s.0.len();
     let UserInput::Num(n @ 1..=9) = input.event() else { return };
     let n = *n as usize - 1;
 
-    if n >= total { return };
+    if n >= total_ingredients { return };
 
-    let ingredient = std::mem::replace(&mut i9s.0[n], get_ingredient());
-    (cauldron).content.push(ingredient);
+    cmds.trigger(UserAction::PickIngredient(n));
 }
 
 fn get_ingredient() -> Ingredient {

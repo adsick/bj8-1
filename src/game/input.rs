@@ -1,9 +1,5 @@
 use bevy::{
-    input::{
-        ButtonState,
-        keyboard::{Key, KeyboardInput},
-    },
-    prelude::*,
+    input::keyboard::Key, prelude::*,
 };
 
 pub struct InputPlugin;
@@ -23,11 +19,6 @@ impl From<u8> for UserInput {
     fn from(value: u8) -> Self {
         Self::Num(value)
     }
-}
-
-#[derive(Event)]
-enum UserAction {
-    PickIngredient(u8),
 }
 
 fn handle_keyboard_input(mut cmds: Commands, kbd: Res<ButtonInput<Key>>) {

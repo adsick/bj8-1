@@ -2,14 +2,15 @@ use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::color::palettes::tailwind::BLUE_400;
 use bevy::prelude::*;
 
-use crate::game::{Cauldron, Ingredient, Ingredients};
+use crate::game::{Cauldron, Ingredient, Ingredients, UserAction};
 
 pub struct GameUiPlugin;
 
 impl Plugin for GameUiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup);
-        app.add_systems(Update, (update_ingredients_list, update_cauldron_list));
+        app.add_observer(update_ingredients_list);
+        app.add_systems(Update, (update_cauldron_list));
         app.insert_resource(GlobalUiDebugOptions { enabled: true, ..default()});
     }
 }
@@ -60,7 +61,16 @@ fn ingredients_panel() -> impl Scene {
             Node {
                 flex_direction: FlexDirection::Column,
             }
-            Children [{ ingredients_list(&[Ingredient{name: "what".into()}, Ingredient{name: "am".into()}, Ingredient{name: "doing".into()}]) }]
+            Children [{ 
+                ingredients_list(
+                    &[
+                        Ingredient{name: "what".into()},
+                        Ingredient{name: "am".into()},
+                        Ingredient{name: "I".into()},
+                        Ingredient{name: "doing".into()},
+                        Ingredient{name: "here".into()},
+                    ])
+            }]
     ]
     }
 }
@@ -110,18 +120,25 @@ fn word(text: impl Into<String>) -> impl Scene {
     }
 }
 
+
 fn ingredient_word(n: usize, i: &Ingredient) -> impl Scene {
-    word(format!("{}. {}", n, i.name))
+    bsn! {
+        @word(format!("{}. {}", n, i.name))
+    }
 }
 
-fn update_ingredients_list(mut cmds: Commands, i9s: Res<Ingredients>, panel_query: Query<(Entity, &Name)>) {
-    if !i9s.is_changed() {
-        return
-    }
-    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("IngredientsList")) else { return };
-    let mut entity = cmds.entity(e);
-    entity.despawn_children();
-    entity.queue_spawn_related_scenes::<Children>(ingredients_list(&i9s.0));
+fn update_ingredients_list(action: On<UserAction>, mut cmds: Commands, i9s: Res<Ingredients>, panel_query: Query<(Entity, &Name, &Children)>) {
+    let UserAction::PickIngredient(picked_ingredient) = action.event() else { return };
+    let Some((_e, _n, c)) = panel_query.iter().find(|(_e, n, c)| n == &&Name::new("IngredientsList")) else { return };
+
+    let i = &i9s.0[*picked_ingredient];
+    // I assume that children are ordered
+    let Some(entity) = c.get(*picked_ingredient) else { debug!("tried to pick an ingredient which doesn't exist: {picked_ingredient}"); return; };
+
+
+    // todo: insert new ingredient from the pool here instead
+    cmds.entity(*entity).apply_scene(ingredient_word(picked_ingredient + 1, i));
+    
 }
 
 fn update_cauldron_list(mut cmds: Commands, cauldron: Res<Cauldron>, panel_query: Query<(Entity, &Name)>) {

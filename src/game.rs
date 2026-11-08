@@ -4,6 +4,13 @@ mod ui;
 
 use bevy::prelude::*;
 
+
+#[derive(Event)]
+pub enum UserAction {
+    // zero-based
+    PickIngredient(usize),
+}
+
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
 enum Mode {
     #[default]
@@ -38,6 +45,18 @@ impl Plugin for GamePlugin {
         app.insert_resource(Ingredients(vec![
             Ingredient {
                 name: "test ingredient".into(),
+            },
+            Ingredient {
+                name: "another ingredient".into(),
+            },
+            Ingredient {
+                name: "another ingredient".into(),
+            },
+            Ingredient {
+                name: "another ingredient".into(),
+            },
+            Ingredient {
+                name: "another ingredient".into(),
             },
             Ingredient {
                 name: "another ingredient".into(),

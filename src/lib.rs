@@ -4,7 +4,6 @@ mod game;
 mod loading;
 mod menu;
 mod old_gameplay;
-mod ui;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -32,12 +31,12 @@ enum GameResult {
     Lost,
 }
 
-pub struct GamePlugin;
+pub struct MainPlugin;
 
-impl Plugin for GamePlugin {
+impl Plugin for MainPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<GameState>()
-            .add_plugins((ui::GameUiPlugin, game::GameplayPlugin));
+            .add_plugins((game::GamePlugin));
 
         #[cfg(debug_assertions)]
         {

@@ -7,7 +7,7 @@ use bevy::ecs::system::NonSendMarker;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy::winit::WINIT_WINDOWS;
-use wordmix::GamePlugin;
+use wordmix::MainPlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
@@ -33,7 +33,7 @@ fn main() {
                     ..default()
                 }),
         )
-        .add_plugins(GamePlugin)
+        .add_plugins(MainPlugin)
         .add_systems(Startup, set_window_icon)
         .run();
 }

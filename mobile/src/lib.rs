@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::WindowMode;
 use bevy::winit::WinitSettings;
-use wordmix::GamePlugin;
+use wordmix::MainPlugin;
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn main_rs() {
@@ -35,7 +35,7 @@ fn main() {
                 }),
                 ..default()
             }),
-            GamePlugin,
+            MainPlugin,
         ))
         .run();
 }

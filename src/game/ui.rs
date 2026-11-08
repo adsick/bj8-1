@@ -2,14 +2,14 @@ use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::color::palettes::tailwind::BLUE_400;
 use bevy::prelude::*;
 
-use crate::game::{Ingredient, Ingredients};
+use crate::game::{Cauldron, Ingredient, Ingredients};
 
 pub struct GameUiPlugin;
 
 impl Plugin for GameUiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup);
-        app.add_systems(Update, update_ingredients_panel);
+        app.add_systems(Update, (update_ingredients_panel, update_cauldron_panel));
         app.insert_resource(GlobalUiDebugOptions { enabled: true, ..default()});
     }
 }
@@ -115,5 +115,12 @@ fn update_ingredients_panel(mut cmds: Commands, i9s: Res<Ingredients>, panel_que
     let mut entity = cmds.entity(e);
     entity.despawn_children();
     entity.queue_spawn_related_scenes::<Children>(ingredients_list(&i9s.0));
+}
+
+fn update_cauldron_panel(mut cmds: Commands, cauldron: Res<Cauldron>, panel_query: Query<(Entity, &Name)>) {
+    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("CauldronPanel")) else { return };
+    let mut entity = cmds.entity(e);
+    entity.despawn_children();
+    entity.queue_spawn_related_scenes::<Children>(cauldron_list(&cauldron.content));
 }
 

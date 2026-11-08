@@ -18,9 +18,9 @@ fn pick_ingredient(input: On<UserInput>, i9s: ResMut<Ingredients>, mut cauldron:
     let i9s = i9s.into_inner();
     let total = i9s.0.len();
     let UserInput::Num(n @ 1..=9) = input.event() else { return };
-    let n = *n as usize;
+    let n = *n as usize - 1;
 
-    if n > total { return };
+    if n >= total { return };
 
     let ingredient = std::mem::replace(&mut i9s.0[n], get_ingredient());
     (cauldron).content.push(ingredient);

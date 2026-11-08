@@ -35,6 +35,8 @@ impl Plugin for GamePlugin {
         app.init_resource::<Ingredients>();
         app.init_resource::<Cauldron>();
         app.init_state::<Mode>();
+
+        app.insert_resource(Ingredients(vec![Ingredient {name: "test ingredient".into()}]));
     }
 }
 

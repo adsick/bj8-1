@@ -83,7 +83,7 @@ fn cauldron() -> impl Scene {
 }
 
 fn ingredients_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
-    i9s.iter().enumerate().map(|(n, i)| Box::new(ingredient_word(n, i)) as _).collect()
+    i9s.iter().enumerate().map(|(n, i)| Box::new(ingredient_word(n + 1, i)) as _).collect()
 }
 
 fn cauldron_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {

@@ -56,6 +56,7 @@ image = { version = "0.25", default-features = false }
 log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }
 bevy-inspector-egui = "0.38.0"
 bevy_common_assets = { version = "0.18.0", features = ["csv"] }
+serde = { version = "1.0.229", features = ["derive"] }
 
 # Required to make `rand`/`getrandom` work on wasm.
 # Backend is selected via `.cargo/config.toml` rustflags for the wasm32-unknown-unknown target.

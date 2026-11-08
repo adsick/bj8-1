@@ -7219,6 +7219,7 @@ dependencies = [
  "image",
  "log",
  "rand 0.9.5",
+ "serde",
  "webbrowser",
  "winit",
 ]

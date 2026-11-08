@@ -10,6 +10,8 @@ use bevy::app::App;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
+use crate::loading::LoadingPlugin;
+
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
 // Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
@@ -36,7 +38,7 @@ pub struct MainPlugin;
 impl Plugin for MainPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<GameState>()
-            .add_plugins((game::GamePlugin));
+            .add_plugins((game::GamePlugin, LoadingPlugin));
 
         
         #[cfg(debug_assertions)]
@@ -44,7 +46,7 @@ impl Plugin for MainPlugin {
             use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
             app.add_plugins((
-                FrameTimeDiagnosticsPlugin::default(),
+                // FrameTimeDiagnosticsPlugin::default(),
                 EguiPlugin::default(),
                 WorldInspectorPlugin::new(),
                 LogDiagnosticsPlugin::default(),

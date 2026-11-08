@@ -2,13 +2,14 @@ use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::color::palettes::tailwind::BLUE_400;
 use bevy::prelude::*;
 
-use crate::game::Ingredient;
+use crate::game::{Ingredient, Ingredients};
 
 pub struct GameUiPlugin;
 
 impl Plugin for GameUiPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup);
+        app.add_systems(Update, update_ingredients_panel);
         app.insert_resource(GlobalUiDebugOptions { enabled: true, ..default()});
     }
 }
@@ -38,7 +39,7 @@ fn main_screen() -> impl Scene {
 
 fn ingredients_panel() -> impl Scene {
     bsn! {
-        #Ingredients
+        #IngredientsPanel
         Node {
             border: px(3),
             width: rem(13),
@@ -82,7 +83,7 @@ fn cauldron() -> impl Scene {
 }
 
 fn ingredients_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
-    i9s.iter().enumerate().map(|(n, i)| Box::new(word(format!("{}. {}", n + 1, &i.name))) as _).collect()
+    i9s.iter().enumerate().map(|(n, i)| Box::new(ingredient_word(n, i)) as _).collect()
 }
 
 fn cauldron_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
@@ -104,3 +105,15 @@ fn word(text: impl Into<String>) -> impl Scene {
         }
     }
 }
+
+fn ingredient_word(n: usize, i: &Ingredient) -> impl Scene {
+    word(format!("{}. {}", n, i.name))
+}
+
+fn update_ingredients_panel(mut cmds: Commands, i9s: Res<Ingredients>, panel_query: Query<(Entity, &Name)>) {
+    let Some((e, _n)) = panel_query.iter().find(|(_e, n)| n == &&Name::new("IngredientsPanel")) else { return };
+    let mut entity = cmds.entity(e);
+    entity.despawn_children();
+    entity.queue_spawn_related_scenes::<Children>(ingredients_list(&i9s.0));
+}
+

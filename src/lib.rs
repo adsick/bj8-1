@@ -51,10 +51,3 @@ impl Plugin for MainPlugin {
         }
     }
 }
-
-#[derive(Resource, Default)]
-pub struct Ingredients(Vec<Ingredient>);
-
-pub struct Ingredient {
-    name: String,
-}

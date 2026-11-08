@@ -2,7 +2,7 @@ use bevy::color::palettes::basic::{GREEN, RED};
 use bevy::color::palettes::tailwind::BLUE_400;
 use bevy::prelude::*;
 
-use crate::{Ingredient};
+use crate::game::Ingredient;
 
 pub struct GameUiPlugin;
 

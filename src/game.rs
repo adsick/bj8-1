@@ -6,12 +6,8 @@ use std::borrow::Borrow;
 
 use bevy::prelude::*;
 
-
 #[derive(Event)]
-pub enum UserAction {
-    // zero-based
-    PickIngredient(usize),
-}
+struct PickIngredient(usize);
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
 enum Mode {
@@ -35,7 +31,7 @@ impl Borrow<str> for Ingredient {
 }
 
 pub struct Product {
-    name: String
+    name: String,
 }
 
 #[derive(Resource, Default)]

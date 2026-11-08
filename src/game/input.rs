@@ -1,6 +1,6 @@
-use bevy::{
-    input::keyboard::Key, prelude::*,
-};
+use bevy::{input::keyboard::Key, prelude::*};
+
+use crate::game::PickIngredient;
 
 pub struct InputPlugin;
 
@@ -28,7 +28,6 @@ fn handle_keyboard_input(mut cmds: Commands, kbd: Res<ButtonInput<Key>>) {
 
         let Ok(n) = c.parse::<u8>() else { continue };
 
-        let input = UserInput::from(n);
-        cmds.trigger(input);
+        cmds.trigger(PickIngredient(n.into()));
     }
 }

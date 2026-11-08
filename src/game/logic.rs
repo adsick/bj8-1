@@ -1,15 +1,13 @@
-
 use std::collections::HashMap;
 
 use bevy::prelude::*;
 
 use crate::game::Cauldron;
-use crate::game::Mode;
-use crate::game::UserAction;
-use crate::game::input::UserInput;
-use crate::game::Product;
 use crate::game::Ingredient;
 use crate::game::Ingredients;
+use crate::game::Mode;
+use crate::game::PickIngredient;
+use crate::game::Product;
 
 pub struct LogicPlugin;
 
@@ -19,23 +17,22 @@ impl Plugin for LogicPlugin {
     }
 }
 
-fn pick_ingredient(input: On<UserInput>, mut cmds: Commands, i9s: Res<Ingredients>) {
-    let i9s = i9s.into_inner();
-    let total_ingredients = i9s.0.len();
-    let UserInput::Num(n @ 1..=9) = input.event() else { return };
-    let n = *n as usize - 1;
-
-    if n >= total_ingredients { return };
-
-    cmds.trigger(UserAction::PickIngredient(n));
+fn pick_ingredient(
+    input: On<PickIngredient>,
+    mut ingredients: ResMut<Ingredients>,
+    mut cauldron: ResMut<Cauldron>,
+) {
+    if input.0 >= ingredients.0.len() {
+        return;
+    }
+    let removed_ingredient = ingredients.0.remove(input.0);
+    cauldron.content.push(removed_ingredient);
 }
 
 fn get_ingredient() -> Ingredient {
-   Ingredient { name: "todo".into() }
-}
-
-fn put_to_cauldron(action: On<UserAction>, cauldron: ResMut<Cauldron>) {
-    // ?
+    Ingredient {
+        name: "todo".into(),
+    }
 }
 
 fn combine_ingredients(i9s: &[Ingredient], product: Product) -> Result<u32, ()> {

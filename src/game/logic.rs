@@ -1,9 +1,13 @@
+
+use std::collections::HashMap;
+
 use bevy::prelude::*;
 
 use crate::game::Cauldron;
 use crate::game::Mode;
 use crate::game::UserAction;
 use crate::game::input::UserInput;
+use crate::game::Product;
 use crate::game::Ingredient;
 use crate::game::Ingredients;
 
@@ -32,4 +36,32 @@ fn get_ingredient() -> Ingredient {
 
 fn put_to_cauldron(action: On<UserAction>, cauldron: ResMut<Cauldron>) {
     // ?
+}
+
+fn combine_ingredients(i9s: &[Ingredient], product: Product) -> Result<u32, ()> {
+    let mut count = HashMap::new();
+    for i in i9s {
+        count_letters(&i.name, &mut count);
+    }
+    let mut prod_count = HashMap::new();
+    count_letters(&product.name, &mut prod_count);
+
+    for (char, n) in prod_count {
+        let Some(incoming) = count.get_mut(&char) else {
+            return Err(());
+        };
+
+        if *incoming < n {
+            return Err(());
+        }
+        *incoming -= n;
+    }
+
+    // todo: or return the count map?
+    let extra: u32 = count.values().sum();
+    Ok(extra)
+}
+
+fn count_letters(word: &str, count: &mut HashMap<char, u32>) {
+    word.chars().for_each(|c| *count.entry(c).or_default() += 1);
 }

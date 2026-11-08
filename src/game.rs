@@ -34,6 +34,10 @@ impl Borrow<str> for Ingredient {
     }
 }
 
+pub struct Product {
+    name: String
+}
+
 #[derive(Resource, Default)]
 pub struct Cauldron {
     content: Vec<Ingredient>,

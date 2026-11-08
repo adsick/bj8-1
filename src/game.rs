@@ -20,6 +20,11 @@ pub struct Ingredient {
     name: String,
 }
 
+#[derive(Resource, Default)]
+pub struct Cauldron {
+    content: Vec<Ingredient>
+}
+
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
@@ -28,6 +33,7 @@ impl Plugin for GamePlugin {
         app.add_systems(Startup, setup);
 
         app.init_resource::<Ingredients>();
+        app.init_resource::<Cauldron>();
         app.init_state::<Mode>();
     }
 }

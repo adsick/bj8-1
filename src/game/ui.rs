@@ -19,13 +19,19 @@ fn setup(mut cmds: Commands) {
 
 fn main_screen() -> impl Scene {
     bsn! {
+        #MainScreen
         Node {
            width: percent(100),
            height: percent(100),
+           flex_direction: FlexDirection::Row,
+           justify_content: JustifyContent::Center,
+           align_items: AlignItems::Center,
 
         }
         Children [
             @ingredients_panel()
+            --
+            @cauldron()
         ]
     }
 }
@@ -46,35 +52,55 @@ fn ingredients_panel() -> impl Scene {
                 height: rem(2),
             }
             Text("ingredients")
+            TextLayout{ justify: Justify::Center } 
             BorderColor{ bottom: Color::BLACK}
             --
             Node {
-                justify_content: JustifyContent::Start, // todo: doesn't do anything?
-                align_content: AlignContent::Start, // same
-                justify_items: JustifyItems::Start,
-                align_items: AlignItems::Start,
                 flex_direction: FlexDirection::Column,
-                // 
             }
             Children [{ ingredients_list(&[Ingredient{name: "what".into()}, Ingredient{name: "am".into()}, Ingredient{name: "doing".into()}]) }]
     ]
     }
 }
 
+fn cauldron() -> impl Scene {
+    bsn! {
+        #Cauldron
+        Node {
+            justify_content: JustifyContent::Start,
+            align_content: AlignContent::Center,
+            // justify_items: JustifyItems::Start,
+            // align_items: AlignItems::Start,
+            flex_direction: FlexDirection::Column,
+            width: px(300),
+            height: px(200)
+        }
+        Children [
+            Text("cauldron")
+        ]
+    }
+}
 
 fn ingredients_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
     i9s.iter().enumerate().map(|(n, i)| Box::new(word(format!("{}. {}", n + 1, &i.name))) as _).collect()
 }
 
+fn cauldron_list(i9s: &[Ingredient]) -> Vec<Box<dyn Scene>> {
+    i9s.iter().map(|i| Box::new(word(format!("{}", &i.name))) as _).collect()
+}
+
 fn word(text: impl Into<String>) -> impl Scene {
     bsn! {
         Node {
-            margin: em(3)
+            margin: UiRect {
+                left: px(7),
+                top: em(0.6)
+            },
         }
+        // BackgroundColor(RED)
         Text(text)
         TextShadow {
             offset: vec2(0.5, 0.5)
         }
-        
     }
 }

@@ -38,6 +38,7 @@ impl Plugin for MainPlugin {
         app.init_state::<GameState>()
             .add_plugins((game::GamePlugin));
 
+        
         #[cfg(debug_assertions)]
         {
             use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};

@@ -14,7 +14,6 @@ impl Plugin for GameUiPlugin {
 }
 
 fn setup(mut cmds: Commands) {
-    cmds.spawn(Camera2d);
     cmds.spawn_scene(main_screen());
 }
 

@@ -25,16 +25,14 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((ui::GameUiPlugin, input::InputPlugin, logic::LogicPlugin));
-        
         app.add_systems(Startup, setup);
-
 
         app.init_resource::<Ingredients>();
         app.init_state::<Mode>();
     }
 }
 
-fn setup(cmds: Commands) {
-    
+fn setup(mut cmds: Commands) {
+    cmds.spawn(Camera2d);
 }
 
